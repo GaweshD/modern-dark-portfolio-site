@@ -1081,6 +1081,7 @@
  }
 
  .admin input,
+ .admin select,
  .admin textarea {
      width: 100%;
      padding: 14px 16px;
@@ -1100,6 +1101,7 @@
  }
 
  .admin input:focus,
+ .admin select:focus,
  .admin textarea:focus {
      border-color: var(--accent);
      box-shadow: 0 0 0 3px var(--accent-glow);
@@ -1108,6 +1110,12 @@
  .admin input::placeholder,
  .admin textarea::placeholder {
      color: var(--text-muted);
+ }
+
+ .admin select {
+     appearance: none;
+     -webkit-appearance: none;
+     -moz-appearance: none;
  }
 
  .admin-btn {
@@ -1317,6 +1325,7 @@
  }
 
  .admin-modal-body input,
+ .admin-modal-body select,
  .admin-modal-body textarea {
      width: 100%;
      padding: 14px 16px;
@@ -1336,6 +1345,7 @@
  }
 
  .admin-modal-body input:focus,
+ .admin-modal-body select:focus,
  .admin-modal-body textarea:focus {
      border-color: var(--accent);
      box-shadow: 0 0 0 3px var(--accent-glow);
@@ -1344,6 +1354,12 @@
  .admin-modal-body input::placeholder,
  .admin-modal-body textarea::placeholder {
      color: var(--text-muted);
+ }
+
+ .admin-modal-body select {
+     appearance: none;
+     -webkit-appearance: none;
+     -moz-appearance: none;
  }
 
  .admin-modal-actions {

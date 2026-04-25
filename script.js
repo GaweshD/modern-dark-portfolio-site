@@ -390,6 +390,45 @@ function imageFileNameFromPath(pathValue) {
     return String(pathValue || '').split('/').pop();
 }
 
+function ensureSelectHasValue(selectEl, value) {
+    if (!selectEl || !value) return;
+    const exists = Array.from(selectEl.options).some(option => option.value === value);
+    if (!exists) {
+        const customOption = document.createElement('option');
+        customOption.value = value;
+        customOption.textContent = value;
+        selectEl.appendChild(customOption);
+    }
+}
+
+function refreshSkillCategorySelectOptions() {
+    const addSelect = document.getElementById('skillCategory');
+    const editSelect = document.getElementById('skillModalCategory');
+    if (!addSelect && !editSelect) return;
+
+    const defaultOptions = ['Web Development', 'Graphic Design', 'Tools & Software', 'Media'];
+    const dynamicOptions = skillCategories.map(category => category.category);
+    const uniqueOptions = [...new Set([...defaultOptions, ...dynamicOptions])];
+
+    function applyOptions(selectEl) {
+        if (!selectEl) return;
+        const selectedValue = selectEl.value;
+        const placeholder = '<option value="" disabled>Select category</option>';
+        const options = uniqueOptions
+            .map(option => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`)
+            .join('');
+        selectEl.innerHTML = `${placeholder}${options}`;
+        if (selectedValue && uniqueOptions.includes(selectedValue)) {
+            selectEl.value = selectedValue;
+        } else {
+            selectEl.value = '';
+        }
+    }
+
+    applyOptions(addSelect);
+    applyOptions(editSelect);
+}
+
 function getProjectStyle(category, index) {
     const normalized = category.toLowerCase();
     if (normalized.includes('design')) return { theme: 'design', icon: 'fa-palette', tagClass: 'tag-design' };
@@ -533,6 +572,8 @@ function initAdminPanel() {
     const skillModalCancelBtn = document.getElementById('skillModalCancelBtn');
     const skillModalSaveBtn = document.getElementById('skillModalSaveBtn');
 
+    refreshSkillCategorySelectOptions();
+
     function closeModal(modalEl) {
         modalEl.hidden = true;
         document.body.style.overflow = '';
@@ -557,6 +598,7 @@ function initAdminPanel() {
 
         projectModalIndexEl.value = String(index);
         projectModalTitleEl.value = project.title;
+        ensureSelectHasValue(projectModalCategoryEl, project.category);
         projectModalCategoryEl.value = project.category;
         projectModalDescriptionEl.value = project.description;
         projectModalImageEl.value = imageFileNameFromPath(project.image);
@@ -569,6 +611,7 @@ function initAdminPanel() {
         const skill = category?.skills?.[skillIndex];
         if (!skill) return;
 
+        ensureSelectHasValue(skillModalCategoryEl, category.category);
         skillModalCategoryIndexEl.value = String(categoryIndex);
         skillModalIndexEl.value = String(skillIndex);
         skillModalCategoryEl.value = category.category;
@@ -671,6 +714,7 @@ function initAdminPanel() {
         savePortfolioData();
         renderPortfolio();
         renderAdminLists();
+        refreshSkillCategorySelectOptions();
         observeRevealElements();
         skillForm.reset();
         adminSaveMessage.textContent = 'Skill added successfully.';
@@ -736,6 +780,7 @@ function initAdminPanel() {
         savePortfolioData();
         renderPortfolio();
         renderAdminLists();
+        refreshSkillCategorySelectOptions();
         observeRevealElements();
         adminSaveMessage.textContent = 'Skill updated successfully.';
         closeSkillModal();
@@ -788,6 +833,7 @@ function initAdminPanel() {
         savePortfolioData();
         renderPortfolio();
         renderAdminLists();
+        refreshSkillCategorySelectOptions();
         observeRevealElements();
         adminSaveMessage.textContent = 'Skill removed successfully.';
     });
