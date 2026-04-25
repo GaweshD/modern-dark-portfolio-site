@@ -293,7 +293,7 @@ const defaultProjects = [
         title: 'Bandarawela Tea Branding',
         category: 'Graphic Design',
         description: 'Designed branding and promotional materials for Bandarawela Tea, including logo creation, packaging stickers, and Facebook page content.',
-        image: 'assets/projects/tea.svg',
+        image: 'assets/projects/Tea.svg',
         url: '',
         linkLabel: 'View Details',
         theme: 'design',
