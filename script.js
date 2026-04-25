@@ -120,6 +120,7 @@ let isDeleting = false;
 const typedEl = document.getElementById('typedText');
 
 function typeEffect() {
+    if (!typedEl) return;
     const current = roles[roleIndex];
     if (isDeleting) {
         charIndex--;
@@ -142,7 +143,7 @@ function typeEffect() {
 
     setTimeout(typeEffect, speed);
 }
-setTimeout(typeEffect, 1200);
+if (typedEl) setTimeout(typeEffect, 1200);
 
 // ==========================================
 // COUNTER ANIMATION
@@ -164,20 +165,20 @@ function animateCounters() {
         requestAnimationFrame(updateCounter);
     });
 }
-setTimeout(animateCounters, 1400);
+if (document.querySelector('.hero-stat-number')) setTimeout(animateCounters, 1400);
 
 // ==========================================
 // NAVBAR SCROLL EFFECTS
 // ==========================================
 const navbar = document.getElementById('navbar');
 const sections = document.querySelectorAll('section');
-const navLinksList = document.querySelectorAll('.nav-links a:not(.nav-cta)');
+const navLinksList = document.querySelectorAll('.nav-links a[href^="#"]:not(.nav-cta)');
 
 window.addEventListener('scroll', () => {
     // Navbar background
-    if (window.scrollY > 50) {
+    if (navbar && window.scrollY > 50) {
         navbar.classList.add('scrolled');
-    } else {
+    } else if (navbar) {
         navbar.classList.remove('scrolled');
     }
 
@@ -198,6 +199,7 @@ window.addEventListener('scroll', () => {
 
     // Back to top
     const btt = document.getElementById('backToTop');
+    if (!btt) return;
     if (window.scrollY > 500) {
         btt.classList.add('visible');
     } else {
@@ -205,9 +207,12 @@ window.addEventListener('scroll', () => {
     }
 });
 
-document.getElementById('backToTop').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+const backToTop = document.getElementById('backToTop');
+if (backToTop) {
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 
 // ==========================================
 // MOBILE NAV
@@ -223,22 +228,334 @@ function toggleNav() {
     document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
 }
 
-navToggle.addEventListener('click', toggleNav);
-navOverlay.addEventListener('click', toggleNav);
+if (navToggle && navOverlay && navLinks) {
+    navToggle.addEventListener('click', toggleNav);
+    navOverlay.addEventListener('click', toggleNav);
 
-navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (navLinks.classList.contains('open')) {
-            toggleNav();
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (navLinks.classList.contains('open')) {
+                toggleNav();
+            }
+        });
+    });
+}
+
+// ==========================================
+// PORTFOLIO DATA + ADMIN PANEL
+// ==========================================
+const defaultProjects = [
+    {
+        title: 'EduWave Website',
+        category: 'Web Development',
+        description: 'An educational platform designed to provide learning resources for students and educators.',
+        url: 'https://eduwave.lk/',
+        linkLabel: 'Visit Website',
+        theme: 'edu',
+        icon: 'fa-graduation-cap',
+        tagClass: 'tag-web'
+    },
+    {
+        title: 'Portfolio Website',
+        category: 'Web Development',
+        description: 'A personal website to showcase my skills, projects, and creative work to potential clients.',
+        url: '',
+        linkLabel: 'Current Project',
+        theme: 'portfolio',
+        icon: 'fa-briefcase',
+        tagClass: 'tag-web'
+    },
+    {
+        title: 'PRANADHA Branding',
+        category: 'Graphic Design',
+        description: 'Created branding and promotional designs for a business including logos and social media content.',
+        url: '',
+        linkLabel: 'View Details',
+        theme: 'design',
+        icon: 'fa-palette',
+        tagClass: 'tag-design'
+    },
+    {
+        title: 'Bandarawela Tea Branding',
+        category: 'Graphic Design',
+        description: 'Created branding and promotional designs for a business including logos and social media content.',
+        url: '',
+        linkLabel: 'View Details',
+        theme: 'design',
+        icon: 'fa-palette',
+        tagClass: 'tag-design'
+    },
+    {
+        title: 'Dinu Vibes',
+        category: 'Media',
+        description: 'A YouTube channel where I produce and share music content and creative videos.',
+        url: 'https://www.youtube.com/@DINU_VIBES_OFFICIAL',
+        linkLabel: 'Watch on YouTube',
+        theme: 'music',
+        icon: 'fa-music',
+        tagClass: 'tag-media'
+    }
+];
+
+const defaultSkills = [
+    {
+        category: 'Web Development',
+        icon: 'fa-code',
+        iconClass: 'web',
+        skills: [
+            { name: 'HTML', icon: 'fa-brands fa-html5' },
+            { name: 'CSS', icon: 'fa-brands fa-css3-alt' },
+            { name: 'JavaScript', icon: 'fa-brands fa-js' },
+            { name: 'Responsive Design', icon: 'fa-solid fa-mobile-screen' },
+            { name: 'UI/UX Basics', icon: 'fa-solid fa-wand-magic-sparkles' }
+        ]
+    },
+    {
+        category: 'Graphic Design',
+        icon: 'fa-palette',
+        iconClass: 'design-icon',
+        skills: [
+            { name: 'Branding', icon: 'fa-solid fa-copyright' },
+            { name: 'Social Media Design', icon: 'fa-solid fa-share-nodes' },
+            { name: 'Visual Content', icon: 'fa-solid fa-image' }
+        ]
+    },
+    {
+        category: 'Tools & Software',
+        icon: 'fa-wrench',
+        iconClass: 'tools-icon',
+        skills: [
+            { name: 'VS Code', icon: 'fa-solid fa-terminal' },
+            { name: 'Canva / Photoshop', icon: 'fa-solid fa-pen-nib' },
+            { name: 'FL Studio', icon: 'fa-solid fa-headphones' },
+            { name: 'YouTube Studio', icon: 'fa-brands fa-youtube' }
+        ]
+    }
+];
+
+const projectThemes = ['edu', 'portfolio', 'design', 'music'];
+const projectIcons = ['fa-briefcase', 'fa-code', 'fa-palette', 'fa-star'];
+const adminPassword = '1234';
+const projectsStorageKey = 'portfolioProjects';
+const skillsStorageKey = 'portfolioSkills';
+
+let projects = loadStoredData(projectsStorageKey, defaultProjects);
+let skillCategories = loadStoredData(skillsStorageKey, defaultSkills);
+
+function loadStoredData(key, fallback) {
+    try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+function savePortfolioData() {
+    localStorage.setItem(projectsStorageKey, JSON.stringify(projects));
+    localStorage.setItem(skillsStorageKey, JSON.stringify(skillCategories));
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function getProjectStyle(category, index) {
+    const normalized = category.toLowerCase();
+    if (normalized.includes('design')) return { theme: 'design', icon: 'fa-palette', tagClass: 'tag-design' };
+    if (normalized.includes('media') || normalized.includes('music') || normalized.includes('video')) {
+        return { theme: 'music', icon: 'fa-music', tagClass: 'tag-media' };
+    }
+    if (normalized.includes('web') || normalized.includes('code')) return { theme: 'edu', icon: 'fa-code', tagClass: 'tag-web' };
+    return {
+        theme: projectThemes[index % projectThemes.length],
+        icon: projectIcons[index % projectIcons.length],
+        tagClass: 'tag-web'
+    };
+}
+
+function renderProjects() {
+    const grid = document.getElementById('projectsGrid');
+    if (!grid) return;
+    grid.innerHTML = projects.map((project, index) => {
+        const fallbackStyle = getProjectStyle(project.category, index);
+        const style = {
+            ...fallbackStyle,
+            theme: project.theme || fallbackStyle.theme,
+            icon: project.icon || fallbackStyle.icon,
+            tagClass: project.tagClass || fallbackStyle.tagClass
+        };
+        const title = escapeHtml(project.title);
+        const category = escapeHtml(project.category);
+        const description = escapeHtml(project.description);
+        const linkLabel = escapeHtml(project.linkLabel || (project.url ? 'Visit Project' : 'View Details'));
+        const cardLink = project.url
+            ? `<a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" class="project-card-link">${linkLabel} <i class="fa-solid fa-arrow-right"></i></a>`
+            : `<span class="project-card-link">${linkLabel} <i class="fa-solid fa-arrow-right"></i></span>`;
+
+        return `
+            <div class="project-card reveal-scale delay-${Math.min(index + 1, 5)}">
+                <div class="project-card-image ${escapeHtml(style.theme)}">
+                    <i class="fa-solid ${escapeHtml(style.icon)}" style="position:relative;z-index:1;color:rgba(255,255,255,0.5);"></i>
+                    <div class="project-icon-bg"></div>
+                </div>
+                <div class="project-card-body">
+                    <span class="project-card-tag ${escapeHtml(style.tagClass)}">${category}</span>
+                    <h3 class="project-card-title">${title}</h3>
+                    <p class="project-card-desc">${description}</p>
+                    ${cardLink}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const projectCounter = document.querySelector('.hero-stat-number[data-count]');
+    if (projectCounter) {
+        projectCounter.dataset.count = projects.length;
+        if (projectCounter.textContent !== '0') projectCounter.textContent = `${projects.length}+`;
+    }
+}
+
+function renderSkills() {
+    const grid = document.getElementById('skillsGrid');
+    if (!grid) return;
+    grid.innerHTML = skillCategories.map((category, index) => {
+        const countLabel = category.skills.length === 1 ? '1 Skill' : `${category.skills.length} Skills`;
+        const tags = category.skills.map(skill => `
+            <div class="skill-tag"><i class="${escapeHtml(skill.icon || 'fa-solid fa-check')}"></i> ${escapeHtml(skill.name)}</div>
+        `).join('');
+
+        return `
+            <div class="skill-category reveal delay-${Math.min(index + 1, 5)}">
+                <div class="skill-category-header">
+                    <div class="skill-category-icon ${escapeHtml(category.iconClass || 'web')}">
+                        <i class="fa-solid ${escapeHtml(category.icon || 'fa-lightbulb')}"></i>
+                    </div>
+                    <div>
+                        <div class="skill-category-name">${escapeHtml(category.category)}</div>
+                        <div class="skill-category-count">${countLabel}</div>
+                    </div>
+                </div>
+                <div class="skill-tags">${tags}</div>
+            </div>
+        `;
+    }).join('');
+
+    const skillCounter = document.querySelectorAll('.hero-stat-number[data-count]')[1];
+    if (skillCounter) {
+        const skillTotal = skillCategories.reduce((total, category) => total + category.skills.length, 0);
+        skillCounter.dataset.count = skillTotal;
+        if (skillCounter.textContent !== '0') skillCounter.textContent = `${skillTotal}+`;
+    }
+}
+
+function renderPortfolio() {
+    renderProjects();
+    renderSkills();
+}
+
+renderPortfolio();
+
+initAdminPanel();
+
+function initAdminPanel() {
+    const adminLogin = document.getElementById('adminLogin');
+    if (!adminLogin) return;
+
+    const adminDashboard = document.getElementById('adminDashboard');
+    const adminPasswordInput = document.getElementById('adminPassword');
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const adminLoginMessage = document.getElementById('adminLoginMessage');
+    const adminSaveMessage = document.getElementById('adminSaveMessage');
+    const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+    const projectForm = document.getElementById('projectForm');
+    const skillForm = document.getElementById('skillForm');
+
+    function showAdminDashboard() {
+        adminLogin.hidden = true;
+        adminDashboard.hidden = false;
+    }
+
+    function showAdminLogin() {
+        adminLogin.hidden = false;
+        adminDashboard.hidden = true;
+        adminPasswordInput.value = '';
+    }
+
+    adminLoginBtn.addEventListener('click', () => {
+        if (adminPasswordInput.value === adminPassword) {
+            showAdminDashboard();
+            adminLoginMessage.textContent = '';
+        } else {
+            adminLoginMessage.textContent = 'Wrong password. Please try again.';
         }
     });
-});
+
+    adminPasswordInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') adminLoginBtn.click();
+    });
+
+    adminLogoutBtn.addEventListener('click', showAdminLogin);
+
+    projectForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const title = document.getElementById('projectTitle').value.trim();
+        const category = document.getElementById('projectCategory').value.trim();
+        const description = document.getElementById('projectDescription').value.trim();
+        const url = document.getElementById('projectUrl').value.trim();
+        if (!title || !category || !description) return;
+
+        const style = getProjectStyle(category, projects.length);
+        projects.push({
+            title,
+            category,
+            description,
+            url,
+            linkLabel: url ? 'Visit Project' : 'View Details',
+            ...style
+        });
+
+        savePortfolioData();
+        renderPortfolio();
+        observeRevealElements();
+        event.target.reset();
+        adminSaveMessage.textContent = 'Project added successfully.';
+    });
+
+    skillForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const categoryName = document.getElementById('skillCategory').value.trim();
+        const skillName = document.getElementById('skillName').value.trim();
+        if (!categoryName || !skillName) return;
+
+        let category = skillCategories.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
+        if (!category) {
+            category = {
+                category: categoryName,
+                icon: 'fa-lightbulb',
+                iconClass: 'web',
+                skills: []
+            };
+            skillCategories.push(category);
+        }
+        category.skills.push({ name: skillName, icon: 'fa-solid fa-check' });
+
+        savePortfolioData();
+        renderPortfolio();
+        observeRevealElements();
+        event.target.reset();
+        adminSaveMessage.textContent = 'Skill added successfully.';
+    });
+}
 
 // ==========================================
 // SCROLL REVEAL ANIMATIONS
 // ==========================================
-const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -250,30 +567,39 @@ const revealObserver = new IntersectionObserver((entries) => {
     rootMargin: '0px 0px -50px 0px'
 });
 
-revealElements.forEach(el => revealObserver.observe(el));
+function observeRevealElements() {
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+        revealObserver.observe(el);
+    });
+}
+
+observeRevealElements();
 
 // ==========================================
 // CONTACT FORM (basic feedback)
 // ==========================================
-document.getElementById('sendBtn').addEventListener('click', function () {
-    const inputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
-    let filled = true;
-    inputs.forEach(input => {
-        if (input.hasAttribute('required') && !input.value.trim()) {
-            filled = false;
-            input.style.borderColor = '#f87171';
+const sendBtn = document.getElementById('sendBtn');
+if (sendBtn) {
+    sendBtn.addEventListener('click', function () {
+        const inputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
+        let filled = true;
+        inputs.forEach(input => {
+            if (input.hasAttribute('required') && !input.value.trim()) {
+                filled = false;
+                input.style.borderColor = '#f87171';
+                setTimeout(() => {
+                    input.style.borderColor = '';
+                }, 2000);
+            }
+        });
+        if (filled) {
+            this.innerHTML = '<i class="fa-solid fa-check"></i> Message Sent!';
+            this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            inputs.forEach(input => input.value = '');
             setTimeout(() => {
-                input.style.borderColor = '';
-            }, 2000);
+                this.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+                this.style.background = '';
+            }, 3000);
         }
     });
-    if (filled) {
-        this.innerHTML = '<i class="fa-solid fa-check"></i> Message Sent!';
-        this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-        inputs.forEach(input => input.value = '');
-        setTimeout(() => {
-            this.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
-            this.style.background = '';
-        }, 3000);
-    }
-});
+}
