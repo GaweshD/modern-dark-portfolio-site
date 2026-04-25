@@ -249,6 +249,7 @@ const defaultProjects = [
         title: 'EduWave Website',
         category: 'Web Development',
         description: 'An educational platform designed to provide learning resources for students and educators.',
+        image: 'assests/projects/eduwave.svg',
         url: 'https://eduwave.lk/',
         linkLabel: 'Visit Website',
         theme: 'edu',
@@ -259,6 +260,7 @@ const defaultProjects = [
         title: 'Portfolio Website',
         category: 'Web Development',
         description: 'A personal website to showcase my skills, projects, and creative work to potential clients.',
+        image: 'assests/projects/portfolio.svg',
         url: '',
         linkLabel: 'Current Project',
         theme: 'portfolio',
@@ -269,6 +271,7 @@ const defaultProjects = [
         title: 'PRANADHA Branding',
         category: 'Graphic Design',
         description: 'Created branding and promotional designs for a business including logos and social media content.',
+        image: 'assests/projects/pranadha.svg',
         url: '',
         linkLabel: 'View Details',
         theme: 'design',
@@ -279,6 +282,7 @@ const defaultProjects = [
         title: 'Bandarawela Tea Branding',
         category: 'Graphic Design',
         description: 'Created branding and promotional designs for a business including logos and social media content.',
+        image: 'assests/projects/tea.svg',
         url: '',
         linkLabel: 'View Details',
         theme: 'design',
@@ -289,6 +293,7 @@ const defaultProjects = [
         title: 'Dinu Vibes',
         category: 'Media',
         description: 'A YouTube channel where I produce and share music content and creative videos.',
+        image: 'assests/projects/dinuvibes.svg',
         url: 'https://www.youtube.com/@DINU_VIBES_OFFICIAL',
         linkLabel: 'Watch on YouTube',
         theme: 'music',
@@ -338,9 +343,16 @@ const projectIcons = ['fa-briefcase', 'fa-code', 'fa-palette', 'fa-star'];
 const adminPassword = '1234';
 const projectsStorageKey = 'portfolioProjects';
 const skillsStorageKey = 'portfolioSkills';
+const projectImageBasePath = 'assests/projects/';
+const fallbackProjectImage = `${projectImageBasePath}default.svg`;
 
 let projects = loadStoredData(projectsStorageKey, defaultProjects);
 let skillCategories = loadStoredData(skillsStorageKey, defaultSkills);
+
+projects = projects.map((project, index) => ({
+    ...project,
+    image: normalizeProjectImagePath(project.image || defaultProjects[index]?.image || fallbackProjectImage)
+}));
 
 function loadStoredData(key, fallback) {
     try {
@@ -363,6 +375,19 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function normalizeProjectImagePath(input) {
+    const raw = String(input || '').trim();
+    if (!raw) return fallbackProjectImage;
+    if (raw.startsWith(projectImageBasePath)) return raw;
+    const fileName = raw.split('/').pop().split('\\').pop().split('?')[0].split('#')[0];
+    if (!fileName) return fallbackProjectImage;
+    return `${projectImageBasePath}${fileName}`;
+}
+
+function imageFileNameFromPath(pathValue) {
+    return String(pathValue || '').split('/').pop();
 }
 
 function getProjectStyle(category, index) {
@@ -393,6 +418,7 @@ function renderProjects() {
         const title = escapeHtml(project.title);
         const category = escapeHtml(project.category);
         const description = escapeHtml(project.description);
+        const image = escapeHtml(project.image || fallbackProjectImage);
         const linkLabel = escapeHtml(project.linkLabel || (project.url ? 'Visit Project' : 'View Details'));
         const cardLink = project.url
             ? `<a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" class="project-card-link">${linkLabel} <i class="fa-solid fa-arrow-right"></i></a>`
@@ -401,8 +427,8 @@ function renderProjects() {
         return `
             <div class="project-card reveal-scale delay-${Math.min(index + 1, 5)}">
                 <div class="project-card-image ${escapeHtml(style.theme)}">
-                    <i class="fa-solid ${escapeHtml(style.icon)}" style="position:relative;z-index:1;color:rgba(255,255,255,0.5);"></i>
-                    <div class="project-icon-bg"></div>
+                    <img src="${image}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='assests/projects/default.svg';" />
+                    <div class="project-image-overlay"></div>
                 </div>
                 <div class="project-card-body">
                     <span class="project-card-tag ${escapeHtml(style.tagClass)}">${category}</span>
@@ -460,6 +486,7 @@ function renderPortfolio() {
 }
 
 renderPortfolio();
+renderAdminLists();
 
 initAdminPanel();
 
@@ -475,10 +502,84 @@ function initAdminPanel() {
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
     const projectForm = document.getElementById('projectForm');
     const skillForm = document.getElementById('skillForm');
+    const adminProjectsList = document.getElementById('adminProjectsList');
+    const adminSkillsList = document.getElementById('adminSkillsList');
+    const projectEditModal = document.getElementById('projectEditModal');
+    const skillEditModal = document.getElementById('skillEditModal');
+
+    const projectTitleEl = document.getElementById('projectTitle');
+    const projectCategoryEl = document.getElementById('projectCategory');
+    const projectDescriptionEl = document.getElementById('projectDescription');
+    const projectImageEl = document.getElementById('projectImage');
+    const projectUrlEl = document.getElementById('projectUrl');
+    const skillCategoryEl = document.getElementById('skillCategory');
+    const skillNameEl = document.getElementById('skillName');
+
+    const projectModalIndexEl = document.getElementById('projectModalIndex');
+    const projectModalTitleEl = document.getElementById('projectModalTitle');
+    const projectModalCategoryEl = document.getElementById('projectModalCategory');
+    const projectModalDescriptionEl = document.getElementById('projectModalDescription');
+    const projectModalImageEl = document.getElementById('projectModalImage');
+    const projectModalUrlEl = document.getElementById('projectModalUrl');
+    const projectModalCloseBtn = document.getElementById('projectModalCloseBtn');
+    const projectModalCancelBtn = document.getElementById('projectModalCancelBtn');
+    const projectModalSaveBtn = document.getElementById('projectModalSaveBtn');
+
+    const skillModalCategoryIndexEl = document.getElementById('skillModalCategoryIndex');
+    const skillModalIndexEl = document.getElementById('skillModalIndex');
+    const skillModalCategoryEl = document.getElementById('skillModalCategory');
+    const skillModalNameEl = document.getElementById('skillModalName');
+    const skillModalCloseBtn = document.getElementById('skillModalCloseBtn');
+    const skillModalCancelBtn = document.getElementById('skillModalCancelBtn');
+    const skillModalSaveBtn = document.getElementById('skillModalSaveBtn');
+
+    function closeModal(modalEl) {
+        modalEl.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    function openModal(modalEl) {
+        modalEl.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProjectModal() {
+        closeModal(projectEditModal);
+    }
+
+    function closeSkillModal() {
+        closeModal(skillEditModal);
+    }
+
+    function startProjectEdit(index) {
+        const project = projects[index];
+        if (!project) return;
+
+        projectModalIndexEl.value = String(index);
+        projectModalTitleEl.value = project.title;
+        projectModalCategoryEl.value = project.category;
+        projectModalDescriptionEl.value = project.description;
+        projectModalImageEl.value = imageFileNameFromPath(project.image);
+        projectModalUrlEl.value = project.url || '';
+        openModal(projectEditModal);
+    }
+
+    function startSkillEdit(categoryIndex, skillIndex) {
+        const category = skillCategories[categoryIndex];
+        const skill = category?.skills?.[skillIndex];
+        if (!skill) return;
+
+        skillModalCategoryIndexEl.value = String(categoryIndex);
+        skillModalIndexEl.value = String(skillIndex);
+        skillModalCategoryEl.value = category.category;
+        skillModalNameEl.value = skill.name;
+        openModal(skillEditModal);
+    }
 
     function showAdminDashboard() {
         adminLogin.hidden = true;
         adminDashboard.hidden = false;
+        renderAdminLists();
     }
 
     function showAdminLogin() {
@@ -501,36 +602,58 @@ function initAdminPanel() {
     });
 
     adminLogoutBtn.addEventListener('click', showAdminLogin);
+    projectModalCloseBtn.addEventListener('click', closeProjectModal);
+    projectModalCancelBtn.addEventListener('click', closeProjectModal);
+    skillModalCloseBtn.addEventListener('click', closeSkillModal);
+    skillModalCancelBtn.addEventListener('click', closeSkillModal);
+
+    projectEditModal.addEventListener('click', (event) => {
+        if (event.target === projectEditModal) closeProjectModal();
+    });
+    skillEditModal.addEventListener('click', (event) => {
+        if (event.target === skillEditModal) closeSkillModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            if (!projectEditModal.hidden) closeProjectModal();
+            if (!skillEditModal.hidden) closeSkillModal();
+        }
+    });
 
     projectForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        const title = document.getElementById('projectTitle').value.trim();
-        const category = document.getElementById('projectCategory').value.trim();
-        const description = document.getElementById('projectDescription').value.trim();
-        const url = document.getElementById('projectUrl').value.trim();
-        if (!title || !category || !description) return;
+        const title = projectTitleEl.value.trim();
+        const category = projectCategoryEl.value.trim();
+        const description = projectDescriptionEl.value.trim();
+        const image = projectImageEl.value.trim();
+        const url = projectUrlEl.value.trim();
+        if (!title || !category || !description || !image) return;
 
         const style = getProjectStyle(category, projects.length);
-        projects.push({
+        const nextProject = {
             title,
             category,
             description,
+            image: normalizeProjectImagePath(image),
             url,
             linkLabel: url ? 'Visit Project' : 'View Details',
             ...style
-        });
+        };
+        projects.push(nextProject);
 
         savePortfolioData();
         renderPortfolio();
+        renderAdminLists();
         observeRevealElements();
-        event.target.reset();
+        projectForm.reset();
         adminSaveMessage.textContent = 'Project added successfully.';
     });
 
     skillForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        const categoryName = document.getElementById('skillCategory').value.trim();
-        const skillName = document.getElementById('skillName').value.trim();
+        const categoryName = skillCategoryEl.value.trim();
+        const skillName = skillNameEl.value.trim();
         if (!categoryName || !skillName) return;
 
         let category = skillCategories.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
@@ -547,10 +670,180 @@ function initAdminPanel() {
 
         savePortfolioData();
         renderPortfolio();
+        renderAdminLists();
         observeRevealElements();
-        event.target.reset();
+        skillForm.reset();
         adminSaveMessage.textContent = 'Skill added successfully.';
     });
+
+    projectModalSaveBtn.addEventListener('click', () => {
+        const editIndex = Number(projectModalIndexEl.value);
+        const title = projectModalTitleEl.value.trim();
+        const category = projectModalCategoryEl.value.trim();
+        const description = projectModalDescriptionEl.value.trim();
+        const image = projectModalImageEl.value.trim();
+        const url = projectModalUrlEl.value.trim();
+        if (!Number.isInteger(editIndex) || !projects[editIndex]) return;
+        if (!title || !category || !description || !image) return;
+
+        const style = getProjectStyle(category, editIndex);
+        projects[editIndex] = {
+            ...projects[editIndex],
+            title,
+            category,
+            description,
+            image: normalizeProjectImagePath(image),
+            url,
+            linkLabel: url ? 'Visit Project' : 'View Details',
+            ...style
+        };
+
+        savePortfolioData();
+        renderPortfolio();
+        renderAdminLists();
+        observeRevealElements();
+        adminSaveMessage.textContent = 'Project updated successfully.';
+        closeProjectModal();
+    });
+
+    skillModalSaveBtn.addEventListener('click', () => {
+        const categoryIndex = Number(skillModalCategoryIndexEl.value);
+        const skillIndex = Number(skillModalIndexEl.value);
+        const categoryName = skillModalCategoryEl.value.trim();
+        const skillName = skillModalNameEl.value.trim();
+        if (!categoryName || !skillName) return;
+        if (!Number.isInteger(categoryIndex) || !Number.isInteger(skillIndex)) return;
+        if (!skillCategories[categoryIndex]?.skills?.[skillIndex]) return;
+
+        const oldSkill = skillCategories[categoryIndex].skills[skillIndex];
+        skillCategories[categoryIndex].skills.splice(skillIndex, 1);
+        if (skillCategories[categoryIndex].skills.length === 0) {
+            skillCategories.splice(categoryIndex, 1);
+        }
+
+        let targetCategory = skillCategories.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
+        if (!targetCategory) {
+            targetCategory = {
+                category: categoryName,
+                icon: 'fa-lightbulb',
+                iconClass: 'web',
+                skills: []
+            };
+            skillCategories.push(targetCategory);
+        }
+        targetCategory.skills.push({ name: skillName, icon: oldSkill.icon || 'fa-solid fa-check' });
+
+        savePortfolioData();
+        renderPortfolio();
+        renderAdminLists();
+        observeRevealElements();
+        adminSaveMessage.textContent = 'Skill updated successfully.';
+        closeSkillModal();
+    });
+
+    adminProjectsList.addEventListener('click', (event) => {
+        const editBtn = event.target.closest('[data-project-edit]');
+        if (editBtn) {
+            const editIndex = Number(editBtn.dataset.projectEdit);
+            if (!Number.isNaN(editIndex)) startProjectEdit(editIndex);
+            return;
+        }
+
+        const removeBtn = event.target.closest('[data-project-remove]');
+        if (!removeBtn) return;
+        const index = Number(removeBtn.dataset.projectRemove);
+        if (Number.isNaN(index)) return;
+
+        projects.splice(index, 1);
+        savePortfolioData();
+        renderPortfolio();
+        renderAdminLists();
+        observeRevealElements();
+        adminSaveMessage.textContent = 'Project removed successfully.';
+    });
+
+    adminSkillsList.addEventListener('click', (event) => {
+        const editBtn = event.target.closest('[data-skill-edit]');
+        if (editBtn) {
+            const categoryIndex = Number(editBtn.dataset.categoryIndex);
+            const skillIndex = Number(editBtn.dataset.skillEdit);
+            if (!Number.isNaN(categoryIndex) && !Number.isNaN(skillIndex)) {
+                startSkillEdit(categoryIndex, skillIndex);
+            }
+            return;
+        }
+
+        const removeBtn = event.target.closest('[data-skill-remove]');
+        if (!removeBtn) return;
+        const categoryIndex = Number(removeBtn.dataset.categoryIndex);
+        const skillIndex = Number(removeBtn.dataset.skillRemove);
+        if (Number.isNaN(categoryIndex) || Number.isNaN(skillIndex)) return;
+        if (!skillCategories[categoryIndex]) return;
+
+        skillCategories[categoryIndex].skills.splice(skillIndex, 1);
+        if (skillCategories[categoryIndex].skills.length === 0) {
+            skillCategories.splice(categoryIndex, 1);
+        }
+
+        savePortfolioData();
+        renderPortfolio();
+        renderAdminLists();
+        observeRevealElements();
+        adminSaveMessage.textContent = 'Skill removed successfully.';
+    });
+}
+
+function renderAdminLists() {
+    const projectsListEl = document.getElementById('adminProjectsList');
+    const skillsListEl = document.getElementById('adminSkillsList');
+    if (!projectsListEl || !skillsListEl) return;
+
+    if (projects.length === 0) {
+        projectsListEl.innerHTML = '<p class="admin-list-empty">No projects found.</p>';
+    } else {
+        projectsListEl.innerHTML = projects.map((project, index) => `
+            <div class="admin-list-item">
+                <div class="admin-list-content">
+                    <strong>${escapeHtml(project.title)}</strong>
+                    <span>${escapeHtml(project.category)} | ${escapeHtml(imageFileNameFromPath(project.image))}</span>
+                </div>
+                <div class="admin-list-actions">
+                    <button type="button" class="admin-edit-btn" data-project-edit="${index}">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </button>
+                    <button type="button" class="admin-delete-btn" data-project-remove="${index}">
+                        <i class="fa-solid fa-trash"></i> Remove
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    const skillRows = [];
+    skillCategories.forEach((category, categoryIndex) => {
+        category.skills.forEach((skill, skillIndex) => {
+            skillRows.push(`
+                <div class="admin-list-item">
+                    <div class="admin-list-content">
+                        <strong>${escapeHtml(skill.name)}</strong>
+                        <span>${escapeHtml(category.category)}</span>
+                    </div>
+                    <div class="admin-list-actions">
+                        <button type="button" class="admin-edit-btn" data-category-index="${categoryIndex}" data-skill-edit="${skillIndex}">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                        <button type="button" class="admin-delete-btn" data-category-index="${categoryIndex}" data-skill-remove="${skillIndex}">
+                            <i class="fa-solid fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `);
+        });
+    });
+
+    skillsListEl.innerHTML = skillRows.length
+        ? skillRows.join('')
+        : '<p class="admin-list-empty">No skills found.</p>';
 }
 
 // ==========================================

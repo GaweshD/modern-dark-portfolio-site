@@ -84,27 +84,91 @@
               <input type="text" id="projectTitle" placeholder="Project title" required />
               <input type="text" id="projectCategory" placeholder="Category" required />
               <textarea id="projectDescription" placeholder="Project description" required></textarea>
+              <input type="text" id="projectImage" placeholder="Image file name (inside assests/projects)" required />
               <input type="url" id="projectUrl" placeholder="Project link (optional)" />
-              <button type="submit" class="admin-btn">
-                <i class="fa-solid fa-plus"></i> Add Project
-              </button>
+              <div class="admin-form-actions">
+                <button type="submit" class="admin-btn" id="projectSubmitBtn">
+                  <i class="fa-solid fa-plus"></i> Add Project
+                </button>
+              </div>
             </form>
 
             <form class="admin-form" id="skillForm">
               <h4><i class="fa-solid fa-lightbulb"></i> Add Skill</h4>
               <input type="text" id="skillCategory" placeholder="Skill category" required />
               <input type="text" id="skillName" placeholder="Skill name" required />
-              <button type="submit" class="admin-btn">
-                <i class="fa-solid fa-plus"></i> Add Skill
-              </button>
+              <div class="admin-form-actions">
+                <button type="submit" class="admin-btn" id="skillSubmitBtn">
+                  <i class="fa-solid fa-plus"></i> Add Skill
+                </button>
+              </div>
             </form>
           </div>
 
           <p class="admin-message success" id="adminSaveMessage"></p>
+
+          <div class="admin-lists">
+            <div class="admin-list-block">
+              <h4><i class="fa-solid fa-folder-open"></i> Existing Projects</h4>
+              <div class="admin-list" id="adminProjectsList"></div>
+            </div>
+            <div class="admin-list-block">
+              <h4><i class="fa-solid fa-list-check"></i> Existing Skills</h4>
+              <div class="admin-list" id="adminSkillsList"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
+  <div class="admin-modal" id="projectEditModal" hidden>
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>Edit Project</h3>
+        <button type="button" class="admin-icon-btn" id="projectModalCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <input type="hidden" id="projectModalIndex" />
+      <div class="admin-modal-body">
+        <input type="text" id="projectModalTitle" placeholder="Project title" required />
+        <input type="text" id="projectModalCategory" placeholder="Category" required />
+        <textarea id="projectModalDescription" placeholder="Project description" required></textarea>
+        <input type="text" id="projectModalImage" placeholder="Image file name (inside assests/projects)" required />
+        <input type="url" id="projectModalUrl" placeholder="Project link (optional)" />
+      </div>
+      <div class="admin-modal-actions">
+        <button type="button" class="admin-btn secondary" id="projectModalCancelBtn">Cancel</button>
+        <button type="button" class="admin-btn" id="projectModalSaveBtn">
+          <i class="fa-solid fa-floppy-disk"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-modal" id="skillEditModal" hidden>
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>Edit Skill</h3>
+        <button type="button" class="admin-icon-btn" id="skillModalCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <input type="hidden" id="skillModalCategoryIndex" />
+      <input type="hidden" id="skillModalIndex" />
+      <div class="admin-modal-body">
+        <input type="text" id="skillModalCategory" placeholder="Skill category" required />
+        <input type="text" id="skillModalName" placeholder="Skill name" required />
+      </div>
+      <div class="admin-modal-actions">
+        <button type="button" class="admin-btn secondary" id="skillModalCancelBtn">Cancel</button>
+        <button type="button" class="admin-btn" id="skillModalSaveBtn">
+          <i class="fa-solid fa-floppy-disk"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
 
   <button class="back-to-top" id="backToTop" aria-label="Back to top">
     <i class="fa-solid fa-arrow-up"></i>

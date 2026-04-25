@@ -800,37 +800,31 @@
      height: 200px;
      position: relative;
      overflow: hidden;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     font-size: 3.5rem;
+     background: #0f172a;
  }
 
- .project-card-image .project-icon-bg {
+ .project-card-image img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     display: block;
+     transition: transform var(--transition-medium);
+ }
+
+ .project-card:hover .project-card-image img {
+     transform: scale(1.05);
+ }
+
+ .project-image-overlay {
      position: absolute;
      inset: 0;
-     opacity: 0.08;
+     opacity: 0.35;
+     background: linear-gradient(to top, rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.15));
      transition: opacity var(--transition-medium);
  }
 
- .project-card:hover .project-icon-bg {
-     opacity: 0.15;
- }
-
- .project-card-image.edu {
-     background: linear-gradient(135deg, #0d253f, #1a3a5c);
- }
-
- .project-card-image.portfolio {
-     background: linear-gradient(135deg, #1a0533, #2d1454);
- }
-
- .project-card-image.design {
-     background: linear-gradient(135deg, #1a2f0d, #2a4a1a);
- }
-
- .project-card-image.music {
-     background: linear-gradient(135deg, #3f0d0d, #5c1a1a);
+ .project-card:hover .project-image-overlay {
+     opacity: 0.2;
  }
 
  .project-card-body {
@@ -1081,6 +1075,11 @@
      color: var(--accent);
  }
 
+ .admin-form-actions {
+     display: flex;
+     gap: 10px;
+ }
+
  .admin input,
  .admin textarea {
      width: 100%;
@@ -1149,6 +1148,209 @@
 
  .admin-message.success {
      color: #4ade80;
+ }
+
+ .admin-lists {
+     margin-top: 28px;
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: 20px;
+ }
+
+ .admin-list-block {
+     background: rgba(255, 255, 255, 0.02);
+     border: 1px solid var(--border);
+     border-radius: 14px;
+     padding: 16px;
+ }
+
+ .admin-list-block h4 {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     margin-bottom: 12px;
+     font-size: 0.95rem;
+ }
+
+ .admin-list {
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+ }
+
+ .admin-list-item {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 10px;
+     border: 1px solid var(--border);
+     border-radius: 10px;
+     padding: 10px 12px;
+     background: rgba(255, 255, 255, 0.02);
+ }
+
+ .admin-list-content {
+     display: flex;
+     flex-direction: column;
+     min-width: 0;
+ }
+
+ .admin-list-content strong,
+ .admin-list-content span {
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+ }
+
+ .admin-list-content strong {
+     font-size: 0.9rem;
+     color: var(--text-primary);
+ }
+
+ .admin-list-content span {
+     font-size: 0.78rem;
+     color: var(--text-muted);
+ }
+
+ .admin-delete-btn {
+     flex-shrink: 0;
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+     border: 1px solid rgba(248, 113, 113, 0.4);
+     background: rgba(248, 113, 113, 0.12);
+     color: #fca5a5;
+     border-radius: 8px;
+     padding: 8px 10px;
+     cursor: pointer;
+     font-size: 0.8rem;
+     font-weight: 600;
+     transition: var(--transition-fast);
+ }
+
+ .admin-delete-btn:hover {
+     background: rgba(248, 113, 113, 0.2);
+     color: #fecaca;
+ }
+
+ .admin-list-actions {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+ }
+
+ .admin-edit-btn {
+     flex-shrink: 0;
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+     border: 1px solid rgba(0, 229, 255, 0.4);
+     background: rgba(0, 229, 255, 0.12);
+     color: #a5f3fc;
+     border-radius: 8px;
+     padding: 8px 10px;
+     cursor: pointer;
+     font-size: 0.8rem;
+     font-weight: 600;
+     transition: var(--transition-fast);
+ }
+
+ .admin-edit-btn:hover {
+     background: rgba(0, 229, 255, 0.2);
+     color: #cffafe;
+ }
+
+ .admin-list-empty {
+     color: var(--text-muted);
+     font-size: 0.85rem;
+     padding: 10px;
+     border: 1px dashed var(--border);
+     border-radius: 10px;
+ }
+
+ .admin-modal {
+     position: fixed;
+     inset: 0;
+     z-index: 1200;
+     background: rgba(2, 6, 23, 0.7);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 20px;
+ }
+
+ .admin-modal-card {
+     width: min(560px, 100%);
+     background: var(--gradient-card);
+     border: 1px solid var(--border);
+     border-radius: 16px;
+     padding: 18px;
+     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+ }
+
+ .admin-modal-header {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 10px;
+     margin-bottom: 14px;
+ }
+
+ .admin-modal-header h3 {
+     font-size: 1.05rem;
+ }
+
+ .admin-icon-btn {
+     width: 34px;
+     height: 34px;
+     border-radius: 8px;
+     border: 1px solid var(--border);
+     background: rgba(255, 255, 255, 0.05);
+     color: var(--text-primary);
+     cursor: pointer;
+ }
+
+ .admin-modal-body {
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+ }
+
+ .admin-modal-body input,
+ .admin-modal-body textarea {
+     width: 100%;
+     padding: 14px 16px;
+     background: var(--bg-card);
+     border: 1px solid var(--border);
+     border-radius: 12px;
+     color: var(--text-primary);
+     font-family: 'Poppins', sans-serif;
+     font-size: 0.9rem;
+     outline: none;
+     transition: var(--transition-fast);
+ }
+
+ .admin-modal-body textarea {
+     min-height: 122px;
+     resize: vertical;
+ }
+
+ .admin-modal-body input:focus,
+ .admin-modal-body textarea:focus {
+     border-color: var(--accent);
+     box-shadow: 0 0 0 3px var(--accent-glow);
+ }
+
+ .admin-modal-body input::placeholder,
+ .admin-modal-body textarea::placeholder {
+     color: var(--text-muted);
+ }
+
+ .admin-modal-actions {
+     margin-top: 14px;
+     display: flex;
+     justify-content: flex-end;
+     gap: 10px;
  }
 
  [hidden] {
@@ -1426,6 +1628,16 @@
 
      .admin-forms {
          grid-template-columns: 1fr;
+     }
+
+     .admin-lists {
+         grid-template-columns: 1fr;
+     }
+
+     .admin-form-actions,
+     .admin-list-actions,
+     .admin-modal-actions {
+         flex-wrap: wrap;
      }
  }
 
