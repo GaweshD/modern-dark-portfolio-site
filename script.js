@@ -926,15 +926,20 @@ function observeRevealElements() {
 observeRevealElements();
 
 // ==========================================
-// CONTACT FORM (basic feedback)
+// CONTACT FORM (Formspree)
 // ==========================================
+const contactForm = document.getElementById('contactForm');
 const sendBtn = document.getElementById('sendBtn');
-if (sendBtn) {
-    sendBtn.addEventListener('click', function () {
-        const inputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
+const contactStatus = document.getElementById('contactStatus');
+
+if (contactForm && sendBtn) {
+    contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const requiredFields = contactForm.querySelectorAll('[required]');
         let filled = true;
-        inputs.forEach(input => {
-            if (input.hasAttribute('required') && !input.value.trim()) {
+        requiredFields.forEach(input => {
+            if (!input.value.trim()) {
                 filled = false;
                 input.style.borderColor = '#f87171';
                 setTimeout(() => {
@@ -942,14 +947,58 @@ if (sendBtn) {
                 }, 2000);
             }
         });
-        if (filled) {
-            this.innerHTML = '<i class="fa-solid fa-check"></i> Message Sent!';
-            this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-            inputs.forEach(input => input.value = '');
+
+        if (!filled) {
+            if (contactStatus) {
+                contactStatus.textContent = 'Please fill in the required fields.';
+                contactStatus.className = 'contact-status error';
+            }
+            return;
+        }
+
+        const originalHtml = sendBtn.innerHTML;
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        if (contactStatus) {
+            contactStatus.textContent = '';
+            contactStatus.className = 'contact-status';
+        }
+
+        try {
+            const formData = new FormData(contactForm);
+            const response = await fetch('https://formspree.io/f/myklvyla', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                contactForm.reset();
+                sendBtn.innerHTML = '<i class="fa-solid fa-check"></i> Message Sent!';
+                if (contactStatus) {
+                    contactStatus.textContent = 'Thanks. Your message has been sent.';
+                    contactStatus.className = 'contact-status success';
+                }
+            } else {
+                throw new Error('Formspree request failed');
+            }
+        } catch (error) {
+            sendBtn.innerHTML = originalHtml;
+            if (contactStatus) {
+                contactStatus.textContent = 'Message could not be sent right now.';
+                contactStatus.className = 'contact-status error';
+            }
+        } finally {
             setTimeout(() => {
-                this.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
-                this.style.background = '';
-            }, 3000);
+                sendBtn.disabled = false;
+                if (sendBtn.innerHTML.includes('Message Sent!')) {
+                    sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+                } else if (sendBtn.innerHTML.includes('Sending...')) {
+                    sendBtn.innerHTML = originalHtml;
+                }
+            }, 2500);
         }
     });
 }
