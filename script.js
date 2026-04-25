@@ -249,7 +249,7 @@ const defaultProjects = [
         title: 'EduWave Website',
         category: 'Web Development',
         description: 'An educational platform designed to provide learning resources for students and educators.',
-        image: 'assests/projects/eduwave.svg',
+        image: 'assets/projects/eduwave.svg',
         url: 'https://eduwave.lk/',
         linkLabel: 'Visit Website',
         theme: 'edu',
@@ -257,10 +257,21 @@ const defaultProjects = [
         tagClass: 'tag-web'
     },
     {
+        title: 'Dinu Vibes',
+        category: 'Media',
+        description: 'A YouTube channel where I produce and share music content and creative videos.',
+        image: 'assets/projects/Dinu Vibes.svg',
+        url: 'https://www.youtube.com/@DINU_VIBES_OFFICIAL',
+        linkLabel: 'Watch on YouTube',
+        theme: 'music',
+        icon: 'fa-music',
+        tagClass: 'tag-media'
+    },
+    {
         title: 'Portfolio Website',
         category: 'Web Development',
         description: 'A personal website to showcase my skills, projects, and creative work to potential clients.',
-        image: 'assests/projects/portfolio.svg',
+        image: 'assets/projects/logo.png',
         url: '',
         linkLabel: 'Current Project',
         theme: 'portfolio',
@@ -271,7 +282,7 @@ const defaultProjects = [
         title: 'PRANADHA Branding',
         category: 'Graphic Design',
         description: 'Created branding and promotional designs for a business including logos and social media content.',
-        image: 'assests/projects/pranadha.svg',
+        image: 'assets/projects/pranadha.svg',
         url: '',
         linkLabel: 'View Details',
         theme: 'design',
@@ -281,8 +292,8 @@ const defaultProjects = [
     {
         title: 'Bandarawela Tea Branding',
         category: 'Graphic Design',
-        description: 'Created branding and promotional designs for a business including logos and social media content.',
-        image: 'assests/projects/tea.svg',
+        description: 'Designed branding and promotional materials for Bandarawela Tea, including logo creation, packaging stickers, and Facebook page content.',
+        image: 'assets/projects/tea.svg',
         url: '',
         linkLabel: 'View Details',
         theme: 'design',
@@ -290,15 +301,15 @@ const defaultProjects = [
         tagClass: 'tag-design'
     },
     {
-        title: 'Dinu Vibes',
-        category: 'Media',
-        description: 'A YouTube channel where I produce and share music content and creative videos.',
-        image: 'assests/projects/dinuvibes.svg',
-        url: 'https://www.youtube.com/@DINU_VIBES_OFFICIAL',
-        linkLabel: 'Watch on YouTube',
-        theme: 'music',
-        icon: 'fa-music',
-        tagClass: 'tag-media'
+        title: 'Everrose Branding',
+        category: 'Graphic Design',
+        description: 'Designed complete branding and promotional assets, including logos and social media content, to enhance business visibility..',
+        image: 'assets/projects/Everrose.svg',
+        url: '',
+        linkLabel: 'View Details',
+        theme: 'design',
+        icon: 'fa-palette',
+        tagClass: 'tag-design'
     }
 ];
 
@@ -343,7 +354,7 @@ const projectIcons = ['fa-briefcase', 'fa-code', 'fa-palette', 'fa-star'];
 const adminPassword = '1234';
 const projectsStorageKey = 'portfolioProjects';
 const skillsStorageKey = 'portfolioSkills';
-const projectImageBasePath = 'assests/projects/';
+const projectImageBasePath = 'assets/projects/';
 const fallbackProjectImage = `${projectImageBasePath}default.svg`;
 
 let projects = loadStoredData(projectsStorageKey, defaultProjects);
@@ -466,7 +477,7 @@ function renderProjects() {
         return `
             <div class="project-card reveal-scale delay-${Math.min(index + 1, 5)}">
                 <div class="project-card-image ${escapeHtml(style.theme)}">
-                    <img src="${image}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='assests/projects/default.svg';" />
+                    <img src="${image}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='assets/projects/default.svg';" />
                     <div class="project-image-overlay"></div>
                 </div>
                 <div class="project-card-body">
