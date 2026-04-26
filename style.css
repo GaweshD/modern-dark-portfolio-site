@@ -1170,6 +1170,10 @@
      max-width: 520px;
  }
 
+ .admin-export .admin-btn {
+     white-space: nowrap;
+ }
+
  .admin-lists {
      margin-top: 28px;
      display: grid;

@@ -356,6 +356,7 @@ const projectsStorageKey = 'portfolioProjects';
 const skillsStorageKey = 'portfolioSkills';
 const projectImageBasePath = 'assets/projects/';
 const fallbackProjectImage = `${projectImageBasePath}default.svg`;
+const githubRepoUrl = 'https://github.com/GaweshD/modern-dark-portfolio-site';
 
 let projects = loadStoredData(projectsStorageKey, defaultProjects);
 let skillCategories = loadStoredData(skillsStorageKey, defaultSkills);
@@ -575,6 +576,7 @@ function initAdminPanel() {
     const adminProjectsList = document.getElementById('adminProjectsList');
     const adminSkillsList = document.getElementById('adminSkillsList');
     const exportDataBtn = document.getElementById('exportDataBtn');
+    const pushGithubBtn = document.getElementById('pushGithubBtn');
     const projectEditModal = document.getElementById('projectEditModal');
     const skillEditModal = document.getElementById('skillEditModal');
 
@@ -680,6 +682,20 @@ function initAdminPanel() {
     exportDataBtn.addEventListener('click', () => {
         downloadJsonFile('portfolio-data.json', buildPortfolioExportData());
         adminSaveMessage.textContent = 'Portfolio JSON exported.';
+    });
+
+    pushGithubBtn.addEventListener('click', async () => {
+        downloadJsonFile('portfolio-data.json', buildPortfolioExportData());
+        const command = `git add portfolio-data.json && git commit -m "Update portfolio data" && git push origin main`;
+
+        try {
+            await navigator.clipboard.writeText(`${command}\n${githubRepoUrl}`);
+            adminSaveMessage.textContent = 'Export downloaded and push command copied to clipboard.';
+        } catch {
+            adminSaveMessage.textContent = 'Export downloaded. Push command ready.';
+        }
+
+        window.open(githubRepoUrl, '_blank', 'noopener,noreferrer');
     });
     projectModalCloseBtn.addEventListener('click', closeProjectModal);
     projectModalCancelBtn.addEventListener('click', closeProjectModal);
