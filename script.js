@@ -357,6 +357,10 @@ const skillsStorageKey = 'portfolioSkills';
 const projectImageBasePath = 'assets/projects/';
 const fallbackProjectImage = `${projectImageBasePath}default.svg`;
 const githubRepoUrl = 'https://github.com/GaweshD/modern-dark-portfolio-site';
+const githubRepoOwner = 'GaweshD';
+const githubRepoName = 'modern-dark-portfolio-site';
+const githubDefaultBranch = 'main';
+const githubPortfolioFilePath = 'portfolio-data.json';
 
 let projects = loadStoredData(projectsStorageKey, defaultProjects);
 let skillCategories = loadStoredData(skillsStorageKey, defaultSkills);
@@ -398,6 +402,15 @@ function downloadJsonFile(filename, data) {
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+}
+
+function encodeUtf8Base64(text) {
+    const bytes = new TextEncoder().encode(text);
+    let binary = '';
+    bytes.forEach(byte => {
+        binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
 }
 
 function escapeHtml(value) {
@@ -577,6 +590,7 @@ function initAdminPanel() {
     const adminSkillsList = document.getElementById('adminSkillsList');
     const exportDataBtn = document.getElementById('exportDataBtn');
     const pushGithubBtn = document.getElementById('pushGithubBtn');
+    const githubTokenInput = document.getElementById('githubTokenInput');
     const projectEditModal = document.getElementById('projectEditModal');
     const skillEditModal = document.getElementById('skillEditModal');
 
@@ -685,17 +699,64 @@ function initAdminPanel() {
     });
 
     pushGithubBtn.addEventListener('click', async () => {
-        downloadJsonFile('portfolio-data.json', buildPortfolioExportData());
-        const command = `git add portfolio-data.json && git commit -m "Update portfolio data" && git push origin main`;
-
-        try {
-            await navigator.clipboard.writeText(`${command}\n${githubRepoUrl}`);
-            adminSaveMessage.textContent = 'Export downloaded and push command copied to clipboard.';
-        } catch {
-            adminSaveMessage.textContent = 'Export downloaded. Push command ready.';
+        const token = githubTokenInput.value.trim();
+        if (!token) {
+            adminSaveMessage.textContent = 'Paste your GitHub token first.';
+            return;
         }
 
-        window.open(githubRepoUrl, '_blank', 'noopener,noreferrer');
+        const fileUrl = `https://api.github.com/repos/${githubRepoOwner}/${githubRepoName}/contents/${githubPortfolioFilePath}`;
+        const payloadText = JSON.stringify(buildPortfolioExportData(), null, 2);
+
+        pushGithubBtn.disabled = true;
+        pushGithubBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Pushing...';
+        adminSaveMessage.textContent = '';
+
+        try {
+            let sha = null;
+            const getResponse = await fetch(`${fileUrl}?ref=${githubDefaultBranch}`, {
+                headers: {
+                    Accept: 'application/vnd.github+json',
+                    Authorization: `Bearer ${token}`,
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+
+            if (getResponse.ok) {
+                const currentFile = await getResponse.json();
+                sha = currentFile.sha;
+            } else if (getResponse.status !== 404) {
+                throw new Error('Unable to read the current file from GitHub.');
+            }
+
+            const putResponse = await fetch(fileUrl, {
+                method: 'PUT',
+                headers: {
+                    Accept: 'application/vnd.github+json',
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                },
+                body: JSON.stringify({
+                    message: 'Update portfolio data from admin panel',
+                    content: encodeUtf8Base64(payloadText),
+                    branch: githubDefaultBranch,
+                    ...(sha ? { sha } : {})
+                })
+            });
+
+            if (!putResponse.ok) {
+                const errorBody = await putResponse.json().catch(() => null);
+                throw new Error(errorBody?.message || 'GitHub push failed.');
+            }
+
+            adminSaveMessage.textContent = 'Portfolio data pushed to GitHub successfully.';
+        } catch (error) {
+            adminSaveMessage.textContent = error.message || 'GitHub push failed.';
+        } finally {
+            pushGithubBtn.disabled = false;
+            pushGithubBtn.innerHTML = '<i class="fa-brands fa-github"></i> Push to GitHub';
+        }
     });
     projectModalCloseBtn.addEventListener('click', closeProjectModal);
     projectModalCancelBtn.addEventListener('click', closeProjectModal);

@@ -1164,6 +1164,29 @@
      background: rgba(255, 255, 255, 0.02);
  }
 
+ .admin-token-input {
+     flex: 1 1 280px;
+     min-width: 220px;
+     padding: 14px 16px;
+     background: var(--bg-card);
+     border: 1px solid var(--border);
+     border-radius: 12px;
+     color: var(--text-primary);
+     font-family: 'Poppins', sans-serif;
+     font-size: 0.9rem;
+     outline: none;
+     transition: var(--transition-fast);
+ }
+
+ .admin-token-input:focus {
+     border-color: var(--accent);
+     box-shadow: 0 0 0 3px var(--accent-glow);
+ }
+
+ .admin-token-input::placeholder {
+     color: var(--text-muted);
+ }
+
  .admin-export-note {
      color: var(--text-secondary);
      font-size: 0.88rem;

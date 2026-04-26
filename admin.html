@@ -121,13 +121,14 @@
           <p class="admin-message success" id="adminSaveMessage"></p>
 
           <div class="admin-export">
+            <input type="password" id="githubTokenInput" class="admin-token-input" placeholder="GitHub token for direct push" autocomplete="off" />
             <button type="button" class="admin-btn secondary" id="exportDataBtn">
               <i class="fa-solid fa-download"></i> Export JSON
             </button>
             <button type="button" class="admin-btn" id="pushGithubBtn">
               <i class="fa-brands fa-github"></i> Push to GitHub
             </button>
-            <p class="admin-export-note">Download the current projects and skill categories as a repo-ready JSON file.</p>
+            <p class="admin-export-note">Push commits directly to GitHub using the token, or export a repo-ready JSON backup.</p>
           </div>
 
           <div class="admin-lists">
