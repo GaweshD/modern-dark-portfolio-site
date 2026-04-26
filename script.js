@@ -379,6 +379,26 @@ function savePortfolioData() {
     localStorage.setItem(skillsStorageKey, JSON.stringify(skillCategories));
 }
 
+function buildPortfolioExportData() {
+    return {
+        projects,
+        skillCategories,
+        exportedAt: new Date().toISOString()
+    };
+}
+
+function downloadJsonFile(filename, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+}
+
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -554,6 +574,7 @@ function initAdminPanel() {
     const skillForm = document.getElementById('skillForm');
     const adminProjectsList = document.getElementById('adminProjectsList');
     const adminSkillsList = document.getElementById('adminSkillsList');
+    const exportDataBtn = document.getElementById('exportDataBtn');
     const projectEditModal = document.getElementById('projectEditModal');
     const skillEditModal = document.getElementById('skillEditModal');
 
@@ -656,6 +677,10 @@ function initAdminPanel() {
     });
 
     adminLogoutBtn.addEventListener('click', showAdminLogin);
+    exportDataBtn.addEventListener('click', () => {
+        downloadJsonFile('portfolio-data.json', buildPortfolioExportData());
+        adminSaveMessage.textContent = 'Portfolio JSON exported.';
+    });
     projectModalCloseBtn.addEventListener('click', closeProjectModal);
     projectModalCancelBtn.addEventListener('click', closeProjectModal);
     skillModalCloseBtn.addEventListener('click', closeSkillModal);
